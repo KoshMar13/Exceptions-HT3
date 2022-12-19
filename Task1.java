@@ -25,8 +25,9 @@ public class Task1 {
         System.out.print("Повторите пароль: ");
         String confirmPassword = sc.nextLine();
         boolean result = false;
+        String pattern = "[A-Za-z0-9]+(_[A-Za-z0-9]+)*";
         try {
-            result = validation(login, password, confirmPassword);
+            result = validation(login, password, confirmPassword, pattern);
         } catch (Exception exc) {
             System.out.println("Вы ввели неверные данные: " + exc.getClass() + " => " + exc.getMessage());
         } finally {
@@ -35,52 +36,43 @@ public class Task1 {
 
     }
 
-    private static boolean validation(String login, String password, String confirmPass)
+    private static boolean validation(String login, String password, String confirmPass, String pattern)
             throws WrongLoginException, WrongPasswordException {
-        if (login.length() >= 20) {
-            throw new WrongLoginException("Логин должен быть не длинее 20-и символов");
-        }
-        if (password.length() >= 20) {
-            throw new WrongPasswordException("Пароль должен быть не длинее 20-и символов");
-        }
-        if (!confirmPass.equals(password)) {
-            throw new WrongPasswordException("Пароли не совпадают");
-        }
-
         try {
-            loginChecker(login);
+            loginChecker(login, pattern);
         } catch (Exception exc) {
-            System.out.println("Логин должен содержать только латинские буквы, цифры и знак подчеркивания");
+            System.out.println(exc.getMessage());
             throw new WrongLoginException("Неверный логин", exc);
         }
 
         try {
-            passwordChecker(password);
+            passwordChecker(password, pattern, confirmPass);
         } catch (Exception exc) {
-            System.out.println("Пароль должен содержать только латинские буквы, цифры и знак подчеркивания");
+            System.out.println(exc.getMessage());
             throw new WrongPasswordException("Неверный пароль", exc);
         }
 
         return true;
     }
 
-    private static void loginChecker(String login) throws IOException {
-        String loginPattern = "[A-Za-z0-9]+(_[A-Za-z0-9]+)*";
-        // if (login.length() > 20) {
-        // throw new IOException();
-        // }
-        if (!login.matches(loginPattern)) {
-            throw new IOException();
+    private static void loginChecker(String login, String pattern) throws IOException {
+        if (login.length() > 20) {
+            throw new IOException("Логин должен быть не длинее 20-и символов");
+        }
+        if (!login.matches(pattern)) {
+            throw new IOException("Логин должен содержать только латинские буквы, цифры и знак подчеркивания");
         }
     }
 
-    private static void passwordChecker(String password) throws IOException {
-        String passwordPattern = "[A-Za-z0-9]+(_[A-Za-z0-9]+)*";
-        // if (password.length() > 20) {
-        // throw new IOException();
-        // }
-        if (!password.matches(passwordPattern)) {
-            throw new IOException();
+    private static void passwordChecker(String password, String pattern, String confirmPass) throws IOException {
+        if (password.length() > 20) {
+            throw new IOException("Пароль должен быть не длинее 20-и символов");
+        }
+        if (!password.matches(pattern)) {
+            throw new IOException("Пароль должен быть не длинее 20-и символов");
+        }
+        if (!confirmPass.equals(password)) {
+            throw new IOException("Пароли не совпадают");
         }
     }
 }
